@@ -35,8 +35,9 @@ Net Inspector answers that in one click.
   Launch at Login.
 
 No root, no kernel extension, no network filter, no telemetry: it reads the
-per-process counters from the built-in `nettop` tool, the same data Activity
-Monitor uses. It never touches your traffic, only the byte counts.
+kernel's per-socket byte counters through the same NetworkStatistics framework
+that Activity Monitor and `nettop` use. It never touches your traffic, only the
+byte counts, and it idles at well under 1% CPU.
 
 ## Install
 
@@ -61,9 +62,18 @@ made yourself. "Launch at Login" works best once the app lives in
 
 ## How it works
 
-- `NetTopMonitor` runs `/usr/bin/nettop -P -d -L 0 …` behind a pseudo-terminal
-  (nettop block-buffers when writing to a pipe) and parses one CSV block per
-  interval into bytes-per-second per pid.
+- `NetworkStatisticsBackend` talks to the private `NetworkStatistics.framework`
+  (loaded with `dlopen`, so there is no link-time dependency). The kernel
+  reports every TCP/UDP socket with its owning pid; once per interval the
+  backend asks for fresh counts and sums the byte deltas per process. This is
+  event-driven and costs almost nothing. The framework also reports an
+  "effective pid", so a download done by a system helper on behalf of an app
+  is credited to that app.
+- `NetTopBackend` is the fallback if that framework is ever unavailable: it
+  runs `/usr/bin/nettop -P -d -L 0 …` behind a pseudo-terminal and parses its
+  CSV output. nettop rescans every socket each interval and burns more than a
+  full CPU core, so it is only used as a last resort (or when forced with
+  `NETINSPECTOR_BACKEND=nettop`).
 - `CPtySpawn` is a small C helper that spawns nettop as a session leader with
   the pty as its controlling terminal, so nettop is hung up and exits whenever
   the app goes away, even after a hard kill.
@@ -79,9 +89,10 @@ made yourself. "Launch at Login" works best once the app lives in
 
 - Speeds are sampled once per interval (1 s by default), so very short bursts
   can be averaged out.
-- `responsibility_get_pid_responsible_for_pid` is a private API. It has been
-  stable for many macOS releases, but if Apple removes it, processes will
-  simply be listed individually instead of grouped.
+- `NetworkStatistics.framework` and `responsibility_get_pid_responsible_for_pid`
+  are private APIs. Both have been stable for many macOS releases. If Apple
+  removes the former, the app falls back to `nettop`; if it removes the latter,
+  processes are listed individually instead of grouped.
 - Traffic from the kernel itself (e.g. some VPN tunnels) is attributed to
   `kernel_task`.
 

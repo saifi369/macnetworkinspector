@@ -4,7 +4,7 @@ import SwiftUI
 @main
 struct NetInspectorApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
-    @ObservedObject private var monitor = NetTopMonitor.shared
+    @ObservedObject private var monitor = TrafficMonitor.shared
 
     var body: some Scene {
         MenuBarExtra {
@@ -38,14 +38,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         source.resume()
         termSource = source
 
-        NetTopMonitor.shared.start()
+        TrafficMonitor.shared.start()
     }
 
     func applicationWillTerminate(_ notification: Notification) {
-        NetTopMonitor.shared.stop()
+        TrafficMonitor.shared.stop()
     }
-}
-
-extension NetTopMonitor {
-    static let shared = NetTopMonitor()
 }

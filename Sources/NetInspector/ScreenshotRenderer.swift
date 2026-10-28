@@ -13,7 +13,7 @@ enum ScreenshotRenderer {
         let dir = URL(fileURLWithPath: directory)
         try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
 
-        let monitor = NetTopMonitor.shared
+        let monitor = TrafficMonitor.shared
         monitor.loadDemo(DemoData.apps)
 
         for (file, appearance) in [("popover-dark", NSAppearance.Name.darkAqua), ("popover-light", .aqua)] {

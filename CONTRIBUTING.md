@@ -10,7 +10,8 @@ Open an issue and include:
 - your macOS version (`sw_vers`),
 - what you expected and what happened instead,
 - if the numbers look wrong, the output of
-  `nettop -P -d -x -n -L 3 -J bytes_in,bytes_out -t external` so we can compare.
+  `nettop -P -d -x -n -L 3 -J bytes_in,bytes_out -t external` so we can compare,
+  and whether `NETINSPECTOR_BACKEND=nettop` changes anything.
 
 ## Development
 
@@ -27,7 +28,9 @@ Layout:
 
 | Path | Purpose |
 | --- | --- |
-| `Sources/NetInspector/NetTopMonitor.swift` | Runs `nettop`, parses its output, publishes per-app speeds |
+| `Sources/NetInspector/TrafficMonitor.swift` | Picks a backend, groups samples per app, publishes speeds |
+| `Sources/NetInspector/NetworkStatisticsBackend.swift` | Default engine: kernel socket counters via NetworkStatistics.framework |
+| `Sources/NetInspector/NetTopBackend.swift` | Fallback engine: parses `nettop` output (CPU heavy) |
 | `Sources/NetInspector/ProcessResolver.swift` | pid → responsible app, name and icon |
 | `Sources/NetInspector/ProcessKiller.swift` | Quit / force-kill, with admin fallback |
 | `Sources/NetInspector/Views/` | SwiftUI menu bar label and popover |

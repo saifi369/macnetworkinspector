@@ -21,7 +21,12 @@ final class ProcessResolver {
         let path: String
     }
 
-    private var processCache: [pid_t: ProcessInfo] = [:]
+    struct Key: Hashable {
+        let pid: pid_t
+        let epid: pid_t
+    }
+
+    private var processCache: [Key: ProcessInfo] = [:]
     private var appCache: [pid_t: AppInfo] = [:]
 
     private typealias ResponsibleFn = @convention(c) (pid_t) -> pid_t
@@ -31,8 +36,9 @@ final class ProcessResolver {
         return unsafeBitCast(sym, to: ResponsibleFn.self)
     }()
 
-    func process(for pid: pid_t, fallbackName: String) -> ProcessInfo {
-        if let cached = processCache[pid] { return cached }
+    func process(for pid: pid_t, epid: pid_t = 0, fallbackName: String) -> ProcessInfo {
+        let key = Key(pid: pid, epid: epid)
+        if let cached = processCache[key] { return cached }
         let path = Self.path(for: pid)
         let name: String
         if let app = NSRunningApplication(processIdentifier: pid), let localized = app.localizedName {
@@ -42,13 +48,14 @@ final class ProcessResolver {
         } else {
             name = fallbackName
         }
-        var responsible = pid
+        // Traffic done on behalf of another process (epid) belongs to that process's app.
+        var responsible = epid > 0 ? epid : pid
         if let fn = responsibleFn {
-            let r = fn(pid)
+            let r = fn(responsible)
             if r > 0 { responsible = r }
         }
         let info = ProcessInfo(pid: pid, name: name, path: path, responsiblePid: responsible)
-        processCache[pid] = info
+        processCache[key] = info
         return info
     }
 
@@ -83,8 +90,8 @@ final class ProcessResolver {
     }
 
     /// Drop cache entries for pids that are no longer reported, so pid reuse cannot show stale names.
-    func prune(keepingProcesses pids: Set<pid_t>, keepingApps appPids: Set<pid_t>) {
-        processCache = processCache.filter { pids.contains($0.key) }
+    func prune(keepingProcesses keys: Set<Key>, keepingApps appPids: Set<pid_t>) {
+        processCache = processCache.filter { keys.contains($0.key) }
         appCache = appCache.filter { appPids.contains($0.key) }
     }
 

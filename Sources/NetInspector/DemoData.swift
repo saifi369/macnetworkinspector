@@ -40,7 +40,7 @@ enum DemoData {
         return AppUsage(
             id: pid, name: name, icon: icon, bundleID: bundleID, isApplication: bundleID != nil,
             path: "", downBps: down, upBps: up,
-            processes: processes.map { ProcessUsage(pid: $0.1, name: $0.0, path: "", downBps: $0.2, upBps: $0.3) },
+            processes: processes.map { ProcessUsage(pid: $0.1, epid: 0, name: $0.0, path: "", downBps: $0.2, upBps: $0.3) },
             lastActive: Date()
         )
     }

@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct MenuBarLabel: View {
-    @ObservedObject var monitor: NetTopMonitor
+    @ObservedObject var monitor: TrafficMonitor
     @AppStorage("menuBarMode") private var mode: MenuBarMode = .both
     @AppStorage("speedUnit") private var unit: SpeedUnit = .bytes
 

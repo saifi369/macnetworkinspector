@@ -3,16 +3,18 @@ import AppKit
 /// Traffic of one OS process, as reported by `nettop`.
 struct ProcessUsage: Identifiable, Equatable {
     let pid: pid_t
+    /// Process this traffic is on behalf of (0 = itself). One helper can serve several apps.
+    let epid: pid_t
     let name: String
     let path: String
     var downBps: Double   // bytes per second
     var upBps: Double
 
-    var id: pid_t { pid }
+    var id: String { "\(pid)/\(epid)" }
     var total: Double { downBps + upBps }
 
     static func == (lhs: ProcessUsage, rhs: ProcessUsage) -> Bool {
-        lhs.pid == rhs.pid && lhs.downBps == rhs.downBps && lhs.upBps == rhs.upBps
+        lhs.id == rhs.id && lhs.downBps == rhs.downBps && lhs.upBps == rhs.upBps
     }
 }
 

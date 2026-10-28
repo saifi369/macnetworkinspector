@@ -2,7 +2,7 @@ import ServiceManagement
 import SwiftUI
 
 struct PopoverView: View {
-    @ObservedObject var monitor: NetTopMonitor
+    @ObservedObject var monitor: TrafficMonitor
     @AppStorage("speedUnit") private var unit: SpeedUnit = .bytes
     @AppStorage("menuBarMode") private var menuBarMode: MenuBarMode = .both
     @State private var notice: String?
@@ -137,6 +137,7 @@ struct PopoverView: View {
             Text(monitor.apps.isEmpty ? "" : "\(monitor.apps.count) apps using the network")
                 .font(.caption)
                 .foregroundStyle(.secondary)
+                .help("Data source: \(monitor.backendName)")
             Spacer()
             Button("Quit Net Inspector") {
                 NSApp.terminate(nil)
