@@ -3,6 +3,7 @@
 #   ./build.sh            build only
 #   ./build.sh --run      build and launch
 #   ./build.sh --install  build and copy to /Applications (then launch)
+#   ./build.sh --screenshots  build and render README images (demo data) into docs/screenshots
 set -euo pipefail
 cd "$(dirname "$0")"
 
@@ -40,6 +41,9 @@ case "${1:-}" in
   --run)
     pkill -x NetInspector 2>/dev/null || true
     open "$APP"
+    ;;
+  --screenshots)
+    "$APP/Contents/MacOS/NetInspector" --screenshots docs/screenshots
     ;;
 esac
 echo "✓ Done: $APP"

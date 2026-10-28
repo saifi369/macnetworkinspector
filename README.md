@@ -11,6 +11,16 @@ with one click.
 Your speed-test widget says you are pulling 25 MB/s, but *what* is doing it?
 Net Inspector answers that in one click.
 
+<p align="center">
+  <img src="docs/screenshots/menubar-dark.png" width="313" alt="Menu bar showing live download and upload speed">
+</p>
+<p align="center">
+  <img src="docs/screenshots/popover-dark.png" width="452" alt="Per-app breakdown with Quit and force-kill buttons">
+</p>
+
+<sub>Screenshots are rendered from demo data (`./build.sh --screenshots`); light mode looks like
+<a href="docs/screenshots/popover-light.png">this</a>.</sub>
+
 ## Features
 
 - Live download / upload speed in the menu bar.

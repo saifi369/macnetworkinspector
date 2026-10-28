@@ -132,6 +132,16 @@ final class NetTopMonitor: ObservableObject {
         start()
     }
 
+    /// Replaces live data with a fixed data set (used for documentation screenshots).
+    func loadDemo(_ demoApps: [AppUsage]) {
+        stop()
+        apps = demoApps
+        totalDown = demoApps.reduce(0) { $0 + $1.downBps }
+        totalUp = demoApps.reduce(0) { $0 + $1.upBps }
+        sampleCount = 1
+        isRunning = true
+    }
+
     func togglePause() {
         if isPaused {
             isPaused = false

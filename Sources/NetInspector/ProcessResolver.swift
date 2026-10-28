@@ -88,7 +88,7 @@ final class ProcessResolver {
         appCache = appCache.filter { appPids.contains($0.key) }
     }
 
-    /// Some apps (WhatsApp, for one) embed invisible bidi marks in their display name.
+    /// Some apps embed invisible bidi marks in their display name; strip them.
     private static func clean(_ name: String) -> String {
         name.unicodeScalars.filter { !$0.properties.isDefaultIgnorableCodePoint }
             .map(String.init).joined()
